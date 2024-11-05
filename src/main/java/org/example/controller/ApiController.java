@@ -39,6 +39,8 @@ public class ApiController {
         }
     }
 
+
+
     @GET
     @Path("/clientes/{email}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -59,6 +61,25 @@ public class ApiController {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
+
+    @POST
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response verificarLogin(ClienteDto clienteDto) {
+        try {
+            Cliente cliente = new Cliente(clienteDto.getNome(), clienteDto.getEmail(), clienteDto.getSenha(), clienteDto.getNumero(), clienteDto.getEndereco());
+            Cliente cliente_email = clienteService.buscarClientePorEmail(clienteDto.getEmail());
+            if (cliente_email != null && cliente.getSenha().equals(clienteDto.getSenha())) {
+                return Response.ok(clienteDto).build();
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED).entity("Email ou senha incorretos").build();
+            }
+        } catch (SQLException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+    }
+
 
     @PUT
     @Path("/clientes/{email}")
